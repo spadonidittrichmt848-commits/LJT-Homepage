@@ -35,3 +35,18 @@ jobs:
           publish_dir: ./_site
           publish_branch: gh-pages
           force_orphan: true
+      - name: Verify deployed pages
+        run: |
+          base_url="https://spadonidittrichmt848-commits.github.io/LJT-Homepage"
+          for attempt in $(seq 1 12); do
+            if curl --fail --silent --show-error --location "$base_url/" -o /tmp/homepage.html && \
+               curl --fail --silent --show-error --location "$base_url/publications/" -o /tmp/publications.html; then
+              break
+            fi
+            sleep 5
+          done
+          grep -q 'Junteng Liu' /tmp/homepage.html
+          grep -q 'SynLogic' /tmp/homepage.html
+          grep -q '<h2>2025</h2>' /tmp/publications.html
+          grep -q 'Composing Parameter-Efficient Modules with Arithmetic Operations' /tmp/publications.html
+          echo "Homepage and publications page verified."
